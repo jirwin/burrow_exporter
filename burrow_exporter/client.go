@@ -15,21 +15,6 @@ import (
 	log "github.com/Sirupsen/logrus"
 )
 
-/*
-Request	Method	URL Format
-Healthcheck	GET	/burrow/admin
-List ClustersResp	GET	/v2/kafka
-Kafka Cluster Detail	GET	/v2/kafka/(cluster)
-List Consumers	GET	/v2/kafka/(cluster)/consumer
-Remove Consumer Group	DELETE	/v2/kafka/(cluster)/consumer/(group)
-List Consumer Topics	GET	/v2/kafka/(cluster)/consumer/(group)/topic
-Consumer Topic Detail	GET	/v2/kafka/(cluster)/consumer/(group)/topic/(topic)
-Consumer Group Status	GET	/v2/kafka/(cluster)/consumer/(group)/status /v2/kafka/(cluster)/consumer/(group)/lag
-List Cluster Topics	GET	/v2/kafka/(cluster)/topic
-Cluster Topic Detail	GET	/v2/kafka/(cluster)/topic/(topic)
-List ClustersResp	GET
-*/
-
 type BurrowResp struct {
 	Error   bool   `json:"error"`
 	Message string `json:"message"`
