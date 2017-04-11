@@ -32,13 +32,18 @@ func (be *BurrowExporter) processGroup(cluster, group string) {
 	}
 
 	for _, partition := range status.Status.Partitions {
-		KafkaLag.With(prometheus.Labels{
+		KafkaConsumerPartitionLag.With(prometheus.Labels{
 			"cluster":   status.Status.Cluster,
 			"group":     status.Status.Group,
 			"topic":     partition.Topic,
 			"partition": strconv.Itoa(int(partition.Partition)),
 		}).Set(float64(partition.End.Lag))
 	}
+
+	KafkaConsumerTotalLag.With(prometheus.Labels{
+		"cluster": status.Status.Cluster,
+		"group":   status.Status.Group,
+	}).Set(float64(status.Status.TotalLag))
 }
 
 func (be *BurrowExporter) processCluster(cluster string) {
