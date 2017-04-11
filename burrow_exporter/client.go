@@ -203,8 +203,6 @@ func (bc *BurrowClient) ClusterDetails(cluster string) (*ClusterDetailsResp, err
 		return nil, err
 	}
 
-	fmt.Println(clusterDetails)
-
 	if clusterDetails.Error {
 		log.WithFields(log.Fields{
 			"err":     clusterDetails.Message,
@@ -266,6 +264,7 @@ func (bc *BurrowClient) ListConsumerTopics(cluster, consumerGroup string) (*Cons
 			"consumerGroup": consumerGroup,
 			"cluster":       cluster,
 		}).Error("error retriving consumer group topics")
+		return nil, errors.New(consumerTopics.Message)
 	}
 
 	return consumerTopics, nil
