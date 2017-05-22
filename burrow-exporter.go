@@ -14,9 +14,11 @@ import (
 	"github.com/jirwin/burrow_exporter/burrow_exporter"
 )
 
+var Version := "0.0.1"
+
 func main() {
 	app := cli.NewApp()
-
+	app.Version = Version
 	app.Name = "burrow-exporter"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
