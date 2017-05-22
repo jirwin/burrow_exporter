@@ -14,7 +14,7 @@ import (
 	"github.com/jirwin/burrow_exporter/burrow_exporter"
 )
 
-var Version = "0.0.1"
+var Version = "0.0.2"
 
 func main() {
 	app := cli.NewApp()
