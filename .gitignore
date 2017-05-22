@@ -17,4 +17,4 @@
 
 burrow-exporter
 dist/
-vendor
+vendor/
