@@ -66,7 +66,7 @@ type ConsumerGroupStatus struct {
 	Complete   bool        `json:"complete"`
 	MaxLag     Partition   `json:"maxlag"`
 	Partitions []Partition `json:"partitions"`
-	TotalLag   int64       `json:"total_lag"`
+	TotalLag   int64       `json:"totallag"`
 }
 
 type Partition struct {
