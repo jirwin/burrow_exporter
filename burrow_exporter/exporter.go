@@ -38,6 +38,20 @@ func (be *BurrowExporter) processGroup(cluster, group string) {
 			"topic":     partition.Topic,
 			"partition": strconv.Itoa(int(partition.Partition)),
 		}).Set(float64(partition.End.Lag))
+
+		KafkaConsumerPartitionCurrentOffset.With(prometheus.Labels{
+			"cluster":   status.Status.Cluster,
+			"group":     status.Status.Group,
+			"topic":     partition.Topic,
+			"partition": strconv.Itoa(int(partition.Partition)),
+		}).Set(float64(partition.End.Offset))
+
+		KafkaConsumerPartitionMaxOffset.With(prometheus.Labels{
+			"cluster":   status.Status.Cluster,
+			"group":     status.Status.Group,
+			"topic":     partition.Topic,
+			"partition": strconv.Itoa(int(partition.Partition)),
+		}).Set(float64(partition.End.MaxOffset))
 	}
 
 	KafkaConsumerTotalLag.With(prometheus.Labels{
