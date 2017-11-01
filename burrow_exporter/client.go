@@ -57,6 +57,7 @@ type Offset struct {
 	Offset    int64 `json:"offset"`
 	Timestamp int64 `json:"timestamp"`
 	Lag       int64 `json:"lag"`
+	MaxOffset int64 `json:"max_offset"`
 }
 
 type ConsumerGroupStatus struct {
