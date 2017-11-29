@@ -103,7 +103,8 @@ func (be *BurrowExporter) Start(ctx context.Context) {
 }
 
 func (be *BurrowExporter) scrape() {
-	log.WithField("timestamp", time.Now().UnixNano()).Info("Scraping burrow...")
+	start := time.Now()
+	log.WithField("timestamp", start.UnixNano()).Info("Scraping burrow...")
 	clusters, err := be.client.ListClusters()
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -125,7 +126,11 @@ func (be *BurrowExporter) scrape() {
 
 	wg.Wait()
 
-	log.WithField("timestamp", time.Now().UnixNano()).Info("Finished scraping burrow.")
+	end := time.Now()
+	log.WithFields(log.Fields{
+		"timestamp": end.UnixNano(),
+		"took":      end.Sub(start),
+	}).Info("Finished scraping burrow.")
 }
 
 func (be *BurrowExporter) mainLoop(ctx context.Context) {
