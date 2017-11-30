@@ -102,8 +102,42 @@ func (be *BurrowExporter) Start(ctx context.Context) {
 	be.mainLoop(ctx)
 }
 
+func (be *BurrowExporter) scrape() {
+	start := time.Now()
+	log.WithField("timestamp", start.UnixNano()).Info("Scraping burrow...")
+	clusters, err := be.client.ListClusters()
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err": err,
+		}).Error("error listing clusters. Continuing.")
+		return
+	}
+
+	wg := sync.WaitGroup{}
+
+	for _, cluster := range clusters.Clusters {
+		wg.Add(1)
+
+		go func(c string) {
+			defer wg.Done()
+			be.processCluster(c)
+		}(cluster)
+	}
+
+	wg.Wait()
+
+	end := time.Now()
+	log.WithFields(log.Fields{
+		"timestamp": end.UnixNano(),
+		"took":      end.Sub(start),
+	}).Info("Finished scraping burrow.")
+}
+
 func (be *BurrowExporter) mainLoop(ctx context.Context) {
 	timer := time.NewTicker(time.Duration(be.interval) * time.Second)
+
+	// scrape at app start without waiting for the first interval to elapse
+	be.scrape()
 
 	for {
 		select {
@@ -113,29 +147,7 @@ func (be *BurrowExporter) mainLoop(ctx context.Context) {
 			return
 
 		case <-timer.C:
-			log.WithField("timestamp", time.Now().UnixNano()).Info("Scraping burrow...")
-			clusters, err := be.client.ListClusters()
-			if err != nil {
-				log.WithFields(log.Fields{
-					"err": err,
-				}).Error("error listing clusters. Continuing.")
-				continue
-			}
-
-			wg := sync.WaitGroup{}
-
-			for _, cluster := range clusters.Clusters {
-				wg.Add(1)
-
-				go func(c string) {
-					defer wg.Done()
-					be.processCluster(c)
-				}(cluster)
-			}
-
-			wg.Wait()
-
-			log.WithField("timestamp", time.Now().UnixNano()).Info("Finished scraping burrow.")
+			be.scrape()
 		}
 	}
 }
