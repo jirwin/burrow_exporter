@@ -43,7 +43,7 @@ type ConsumerGroupsResp struct {
 	ConsumerGroups []string `json:"consumers"`
 }
 
-type ConsumerGroupTopicsResp struct {
+type TopicsResp struct {
 	BurrowResp
 	Topics []string `json:"topics"`
 }
@@ -227,13 +227,13 @@ func (bc *BurrowClient) ListConsumers(cluster string) (*ConsumerGroupsResp, erro
 	return consumers, nil
 }
 
-func (bc *BurrowClient) ListConsumerTopics(cluster, consumerGroup string) (*ConsumerGroupTopicsResp, error) {
+func (bc *BurrowClient) ListConsumerTopics(cluster, consumerGroup string) (*TopicsResp, error) {
 	endpoint, err := bc.buildUrl(fmt.Sprintf("/v2/kafka/%s/consumer/%s/topic", cluster, consumerGroup))
 	if err != nil {
 		return nil, err
 	}
 
-	consumerTopics := &ConsumerGroupTopicsResp{}
+	consumerTopics := &TopicsResp{}
 	err = bc.getJsonReq(endpoint, consumerTopics)
 	if err != nil {
 		log.WithFields(log.Fields{
@@ -249,7 +249,34 @@ func (bc *BurrowClient) ListConsumerTopics(cluster, consumerGroup string) (*Cons
 			"err":           consumerTopics.Message,
 			"consumerGroup": consumerGroup,
 			"cluster":       cluster,
-		}).Error("error retriving consumer group topics")
+		}).Error("error retrieving consumer group topics")
+		return nil, errors.New(consumerTopics.Message)
+	}
+
+	return consumerTopics, nil
+}
+
+func (bc *BurrowClient) ListClusterTopics(cluster string) (*TopicsResp, error) {
+	endpoint, err := bc.buildUrl(fmt.Sprintf("/v2/kafka/%s/topic", cluster))
+	if err != nil {
+		return nil, err
+	}
+
+	consumerTopics := &TopicsResp{}
+	err = bc.getJsonReq(endpoint, consumerTopics)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err":     err,
+			"cluster": cluster,
+		}).Error("error retrieving cluster topics")
+		return nil, err
+	}
+
+	if consumerTopics.Error {
+		log.WithFields(log.Fields{
+			"err":     consumerTopics.Message,
+			"cluster": cluster,
+		}).Error("error retrieving cluster topics")
 		return nil, errors.New(consumerTopics.Message)
 	}
 

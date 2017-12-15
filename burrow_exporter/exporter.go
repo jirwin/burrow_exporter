@@ -60,6 +60,25 @@ func (be *BurrowExporter) processGroup(cluster, group string) {
 	}).Set(float64(status.Status.TotalLag))
 }
 
+func (be *BurrowExporter) processTopic(cluster, topic string) {
+	details, err := be.client.ClusterTopicDetails(cluster, topic)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err":   err,
+			"topic": topic,
+		}).Error("error getting status for cluster topic. returning.")
+		return
+	}
+
+	for i, offset := range details.Offsets {
+		KafkaTopicPartitionOffset.With(prometheus.Labels{
+			"cluster":   cluster,
+			"topic":     topic,
+			"partition": strconv.Itoa(i),
+		}).Set(float64(offset))
+	}
+}
+
 func (be *BurrowExporter) processCluster(cluster string) {
 	groups, err := be.client.ListConsumers(cluster)
 	if err != nil {
@@ -67,6 +86,15 @@ func (be *BurrowExporter) processCluster(cluster string) {
 			"err":     err,
 			"cluster": cluster,
 		}).Error("error listing consumer groups. returning.")
+		return
+	}
+
+	topics, err := be.client.ListClusterTopics(cluster)
+	if err != nil {
+		log.WithFields(log.Fields{
+			"err":     err,
+			"cluster": cluster,
+		}).Error("error listing cluster topics. returning.")
 		return
 	}
 
@@ -79,6 +107,15 @@ func (be *BurrowExporter) processCluster(cluster string) {
 			defer wg.Done()
 			be.processGroup(cluster, g)
 		}(group)
+	}
+
+	for _, topic := range topics.Topics {
+		wg.Add(1)
+
+		go func(t string) {
+			defer wg.Done()
+			be.processTopic(cluster, t)
+		}(topic)
 	}
 
 	wg.Wait()

@@ -31,6 +31,13 @@ var (
 		},
 		[]string{"cluster", "group"},
 	)
+	KafkaTopicPartitionOffset = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "kafka_burrow_topic_partition_offset",
+			Help: "The latest offset on a topic's partition as reported by burrow.",
+		},
+		[]string{"cluster", "topic", "partition"},
+	)
 )
 
 func init() {
@@ -38,4 +45,5 @@ func init() {
 	prometheus.MustRegister(KafkaConsumerPartitionCurrentOffset)
 	prometheus.MustRegister(KafkaConsumerPartitionMaxOffset)
 	prometheus.MustRegister(KafkaConsumerTotalLag)
+	prometheus.MustRegister(KafkaTopicPartitionOffset)
 }
