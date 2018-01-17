@@ -1,4 +1,4 @@
-FROM golang:alpine as glide
+FROM golang:1.9.2-alpine3.6@sha256:577cd4aa00e214b007d12d8b4c9edd2ef096794366ec9afbc7eb2daf9da61744 as glide
 RUN apk update
 RUN apk add git
 RUN go get github.com/Masterminds/glide
