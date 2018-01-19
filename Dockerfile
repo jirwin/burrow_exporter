@@ -5,7 +5,7 @@ RUN go get github.com/Masterminds/glide
 WORKDIR /go/src/github.com/jirwin/burrow_exporter
 COPY . /go/src/github.com/jirwin/burrow_exporter
 RUN glide install
-RUN go build burrow-exporter.go
+RUN go build -o burrow-exporter
 
 FROM alpine
 COPY --from=glide /go/src/github.com/jirwin/burrow_exporter/burrow-exporter .
