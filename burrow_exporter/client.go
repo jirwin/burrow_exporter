@@ -64,7 +64,7 @@ type ConsumerGroupStatus struct {
 	Cluster    string      `json:"cluster"`
 	Group      string      `json:"group"`
 	Status     string      `json:"status"`
-	Complete   bool        `json:"complete"`
+	Complete   float32     `json:"complete"`
 	MaxLag     Partition   `json:"maxlag"`
 	Partitions []Partition `json:"partitions"`
 	TotalLag   int64       `json:"totallag"`
