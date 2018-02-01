@@ -189,9 +189,9 @@ func (be *BurrowExporter) mainLoop(ctx context.Context) {
 	}
 }
 
-func MakeBurrowExporter(burrowUrl string, metricsAddr string, interval int) *BurrowExporter {
+func MakeBurrowExporter(burrowUrl string, apiVersion int, metricsAddr string, interval int) *BurrowExporter {
 	return &BurrowExporter{
-		client:            MakeBurrowClient(burrowUrl),
+		client:            MakeBurrowClient(burrowUrl, apiVersion),
 		metricsListenAddr: metricsAddr,
 		interval:          interval,
 	}

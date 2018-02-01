@@ -64,7 +64,6 @@ type ConsumerGroupStatus struct {
 	Cluster    string      `json:"cluster"`
 	Group      string      `json:"group"`
 	Status     string      `json:"status"`
-	Complete   bool        `json:"complete"`
 	MaxLag     Partition   `json:"maxlag"`
 	Partitions []Partition `json:"partitions"`
 	TotalLag   int64       `json:"totallag"`
@@ -89,8 +88,9 @@ type ClusterTopicDetailsResp struct {
 }
 
 type BurrowClient struct {
-	baseUrl string
-	client  *http.Client
+	baseUrl    string
+	apiversion int
+	client     *http.Client
 }
 
 func (bc *BurrowClient) buildUrl(endpoint string) (string, error) {
@@ -149,7 +149,7 @@ func (bc *BurrowClient) HealthCheck() (bool, error) {
 }
 
 func (bc *BurrowClient) ListClusters() (*ClustersResp, error) {
-	endpoint, err := bc.buildUrl("/v2/kafka")
+	endpoint, err := bc.buildUrl("/kafka")
 	if err != nil {
 		return nil, err
 	}
@@ -174,7 +174,7 @@ func (bc *BurrowClient) ListClusters() (*ClustersResp, error) {
 }
 
 func (bc *BurrowClient) ClusterDetails(cluster string) (*ClusterDetailsResp, error) {
-	endpoint, err := bc.buildUrl(fmt.Sprintf("/v2/kafka/%s", cluster))
+	endpoint, err := bc.buildUrl(fmt.Sprintf("/kafka/%s", cluster))
 	if err != nil {
 		return nil, err
 	}
@@ -201,7 +201,7 @@ func (bc *BurrowClient) ClusterDetails(cluster string) (*ClusterDetailsResp, err
 }
 
 func (bc *BurrowClient) ListConsumers(cluster string) (*ConsumerGroupsResp, error) {
-	endpoint, err := bc.buildUrl(fmt.Sprintf("/v2/kafka/%s/consumer", cluster))
+	endpoint, err := bc.buildUrl(fmt.Sprintf("/kafka/%s/consumer", cluster))
 	if err != nil {
 		return nil, err
 	}
@@ -228,7 +228,7 @@ func (bc *BurrowClient) ListConsumers(cluster string) (*ConsumerGroupsResp, erro
 }
 
 func (bc *BurrowClient) ListConsumerTopics(cluster, consumerGroup string) (*TopicsResp, error) {
-	endpoint, err := bc.buildUrl(fmt.Sprintf("/v2/kafka/%s/consumer/%s/topic", cluster, consumerGroup))
+	endpoint, err := bc.buildUrl(fmt.Sprintf("/kafka/%s/consumer/%s/topic", cluster, consumerGroup))
 	if err != nil {
 		return nil, err
 	}
@@ -257,7 +257,7 @@ func (bc *BurrowClient) ListConsumerTopics(cluster, consumerGroup string) (*Topi
 }
 
 func (bc *BurrowClient) ListClusterTopics(cluster string) (*TopicsResp, error) {
-	endpoint, err := bc.buildUrl(fmt.Sprintf("/v2/kafka/%s/topic", cluster))
+	endpoint, err := bc.buildUrl(fmt.Sprintf("/kafka/%s/topic", cluster))
 	if err != nil {
 		return nil, err
 	}
@@ -284,7 +284,7 @@ func (bc *BurrowClient) ListClusterTopics(cluster string) (*TopicsResp, error) {
 }
 
 func (bc *BurrowClient) ConsumerGroupTopicDetails(cluster, consumerGroup, topic string) (*ConsumerGroupTopicDetailsResp, error) {
-	endpoint, err := bc.buildUrl(fmt.Sprintf("/v2/kafka/%s/consumer/%s/topic/%s", cluster, consumerGroup, topic))
+	endpoint, err := bc.buildUrl(fmt.Sprintf("/kafka/%s/consumer/%s/topic/%s", cluster, consumerGroup, topic))
 	if err != nil {
 		return nil, err
 	}
@@ -315,7 +315,7 @@ func (bc *BurrowClient) ConsumerGroupTopicDetails(cluster, consumerGroup, topic 
 }
 
 func (bc *BurrowClient) ConsumerGroupStatus(cluster, consumerGroup string) (*ConsumerGroupStatusResp, error) {
-	endpoint, err := bc.buildUrl(fmt.Sprintf("/v2/kafka/%s/consumer/%s/status", cluster, consumerGroup))
+	endpoint, err := bc.buildUrl(fmt.Sprintf("/kafka/%s/consumer/%s/status", cluster, consumerGroup))
 	if err != nil {
 		return nil, err
 	}
@@ -344,7 +344,7 @@ func (bc *BurrowClient) ConsumerGroupStatus(cluster, consumerGroup string) (*Con
 }
 
 func (bc *BurrowClient) ConsumerGroupLag(cluster, consumerGroup string) (*ConsumerGroupStatusResp, error) {
-	endpoint, err := bc.buildUrl(fmt.Sprintf("/v2/kafka/%s/consumer/%s/lag", cluster, consumerGroup))
+	endpoint, err := bc.buildUrl(fmt.Sprintf("/kafka/%s/consumer/%s/lag", cluster, consumerGroup))
 	if err != nil {
 		return nil, err
 	}
@@ -373,7 +373,7 @@ func (bc *BurrowClient) ConsumerGroupLag(cluster, consumerGroup string) (*Consum
 }
 
 func (bc *BurrowClient) ClusterTopicDetails(cluster, topic string) (*ClusterTopicDetailsResp, error) {
-	endpoint, err := bc.buildUrl(fmt.Sprintf("/v2/kafka/%s/topic/%s", cluster, topic))
+	endpoint, err := bc.buildUrl(fmt.Sprintf("/kafka/%s/topic/%s", cluster, topic))
 	if err != nil {
 		return nil, err
 	}
@@ -401,9 +401,10 @@ func (bc *BurrowClient) ClusterTopicDetails(cluster, topic string) (*ClusterTopi
 	return topicDetails, nil
 }
 
-func MakeBurrowClient(baseUrl string) *BurrowClient {
+func MakeBurrowClient(baseUrl string, apiVersion int) *BurrowClient {
 	return &BurrowClient{
-		baseUrl: baseUrl,
+		baseUrl:    fmt.Sprintf("%s/v%d", baseUrl, apiVersion),
+		apiversion: apiVersion,
 		client: &http.Client{
 			Timeout: 10 * time.Second,
 		},
