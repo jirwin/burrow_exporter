@@ -14,7 +14,7 @@ import (
 	"github.com/jirwin/burrow_exporter/burrow_exporter"
 )
 
-var Version = "0.0.3"
+var Version = "0.0.4"
 
 func main() {
 	app := cli.NewApp()
@@ -32,6 +32,11 @@ func main() {
 		cli.IntFlag{
 			Name:  "interval",
 			Usage: "The interval(seconds) specifies how often to scrape burrow.",
+		},
+		cli.IntFlag{
+			Name:  "api-version",
+			Usage: "Burrow API version to leverage",
+			Value: 2,
 		},
 	}
 
@@ -57,7 +62,7 @@ func main() {
 
 		ctx, cancel := context.WithCancel(context.Background())
 
-		exporter := burrow_exporter.MakeBurrowExporter(c.String("burrow-addr"), c.String("metrics-addr"), c.Int("interval"))
+		exporter := burrow_exporter.MakeBurrowExporter(c.String("burrow-addr"), c.Int("api-version"), c.String("metrics-addr"), c.Int("interval"))
 		go exporter.Start(ctx)
 
 		<-done
