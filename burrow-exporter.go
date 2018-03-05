@@ -11,6 +11,8 @@ import (
 	"os/signal"
 	"syscall"
 
+	"strings"
+
 	"github.com/jirwin/burrow_exporter/burrow_exporter"
 )
 
@@ -57,7 +59,8 @@ func main() {
 
 		ctx, cancel := context.WithCancel(context.Background())
 
-		exporter := burrow_exporter.MakeBurrowExporter(c.String("burrow-addr"), c.String("metrics-addr"), c.Int("interval"))
+		// Handle situation where metric url includs http prefix.
+		exporter := burrow_exporter.MakeBurrowExporter(c.String("burrow-addr"), strings.TrimPrefix(c.String("metrics-addr"),"http:"), c.Int("interval"))
 		go exporter.Start(ctx)
 
 		<-done
