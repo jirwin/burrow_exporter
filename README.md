@@ -31,5 +31,6 @@ docker run -d -p 8080:8080 \
   -e API_VERSION="2" \
   burrow_exporter
 # with custom command
-docker run -d burrow_exporter -p 8080:8080 ./burrow-exporter --burrow-addr http://localhost:8000 --metrics-addr 0.0.0.0:8080 --interval 30 --api-version 2
+docker run -d -p 8080:8080 burrow_exporter ./burrow-exporter --burrow-addr http://localhost:8000 --metrics-addr 0.0.0.0:8080 --interval 30 --api-version 2
+
 ```
