@@ -24,6 +24,8 @@ type BurrowExporter struct {
 	skipConsumerStatus  bool
 }
 
+var partitionStatuses = []string{"OK", "WARNING", "STALL", "STOP", "ERROR"}
+
 func (be *BurrowExporter) processGroup(cluster, group string) {
 	status, err := be.client.ConsumerGroupLag(cluster, group)
 	if err != nil {
@@ -63,6 +65,20 @@ func (be *BurrowExporter) processGroup(cluster, group string) {
 			"topic":     partition.Topic,
 			"partition": strconv.Itoa(int(partition.Partition)),
 		}).Set(float64(partition.End.MaxOffset))
+
+		for _, partitionStatus := range partitionStatuses {
+			value := 0
+			if partitionStatus == partition.Status {
+				value = 1
+			}
+			KafkaConsumerPartitionStatus.With(prometheus.Labels{
+				"cluster":   status.Status.Cluster,
+				"group":     status.Status.Group,
+				"topic":     partition.Topic,
+				"partition": strconv.Itoa(int(partition.Partition)),
+				"status":    partitionStatus,
+			}).Set(float64(value))
+		}
 	}
 
 	KafkaConsumerTotalLag.With(prometheus.Labels{

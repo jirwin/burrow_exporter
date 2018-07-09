@@ -63,6 +63,13 @@ var (
 		},
 		[]string{"cluster", "topic", "partition"},
 	)
+	KafkaConsumerPartitionStatus = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "kafka_burrow_partition_status",
+			Help: "The latest infos for the partition delivered in label as reported by burrow.",
+		},
+		[]string{"cluster", "topic", "group", "partition", "status"},
+	)
 )
 
 func init() {
@@ -73,4 +80,5 @@ func init() {
 	prometheus.MustRegister(KafkaConsumerTotalLag)
 	prometheus.MustRegister(KafkaConsumerStatus)
 	prometheus.MustRegister(KafkaTopicPartitionOffset)
+	prometheus.MustRegister(KafkaConsumerPartitionStatus)
 }
