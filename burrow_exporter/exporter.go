@@ -16,10 +16,12 @@ import (
 )
 
 type BurrowExporter struct {
-	client            *BurrowClient
-	metricsListenAddr string
-	interval          int
-	wg                sync.WaitGroup
+	client              *BurrowClient
+	metricsListenAddr   string
+	interval            int
+	wg                  sync.WaitGroup
+	skipPartitionStatus bool
+	skipConsumerStatus  bool
 }
 
 func (be *BurrowExporter) processGroup(cluster, group string) {
@@ -46,6 +48,15 @@ func (be *BurrowExporter) processGroup(cluster, group string) {
 			"partition": strconv.Itoa(int(partition.Partition)),
 		}).Set(float64(partition.End.Offset))
 
+		if !be.skipPartitionStatus {
+			KafkaConsumerPartitionCurrentStatus.With(prometheus.Labels{
+				"cluster":   status.Status.Cluster,
+				"group":     status.Status.Group,
+				"topic":     partition.Topic,
+				"partition": strconv.Itoa(int(partition.Partition)),
+			}).Set(float64(Status[partition.Status]))
+		}
+
 		KafkaConsumerPartitionMaxOffset.With(prometheus.Labels{
 			"cluster":   status.Status.Cluster,
 			"group":     status.Status.Group,
@@ -58,6 +69,13 @@ func (be *BurrowExporter) processGroup(cluster, group string) {
 		"cluster": status.Status.Cluster,
 		"group":   status.Status.Group,
 	}).Set(float64(status.Status.TotalLag))
+
+	if !be.skipConsumerStatus {
+		KafkaConsumerStatus.With(prometheus.Labels{
+			"cluster": status.Status.Cluster,
+			"group":   status.Status.Group,
+		}).Set(float64(Status[status.Status.Status]))
+	}
 }
 
 func (be *BurrowExporter) processTopic(cluster, topic string) {
@@ -189,10 +207,13 @@ func (be *BurrowExporter) mainLoop(ctx context.Context) {
 	}
 }
 
-func MakeBurrowExporter(burrowUrl string, apiVersion int, metricsAddr string, interval int) *BurrowExporter {
+func MakeBurrowExporter(burrowUrl string, apiVersion int, metricsAddr string, interval int, skipPartitionStatus bool,
+	skipConsumerStatus bool) *BurrowExporter {
 	return &BurrowExporter{
-		client:            MakeBurrowClient(burrowUrl, apiVersion),
-		metricsListenAddr: metricsAddr,
-		interval:          interval,
+		client:              MakeBurrowClient(burrowUrl, apiVersion),
+		metricsListenAddr:   metricsAddr,
+		interval:            interval,
+		skipPartitionStatus: skipPartitionStatus,
+		skipConsumerStatus:  skipConsumerStatus,
 	}
 }

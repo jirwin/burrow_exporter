@@ -2,6 +2,17 @@ package burrow_exporter
 
 import "github.com/prometheus/client_golang/prometheus"
 
+// If we are missing a status, it will return 0
+var Status = map[string]int{
+	"NOTFOUND": 1,
+	"OK":       2,
+	"WARN":     3,
+	"ERR":      4,
+	"STOP":     5,
+	"STALL":    6,
+	"REWIND":   7,
+}
+
 var (
 	KafkaConsumerPartitionLag = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
@@ -14,6 +25,13 @@ var (
 		prometheus.GaugeOpts{
 			Name: "kafka_burrow_partition_current_offset",
 			Help: "The latest offset commit on a partition as reported by burrow.",
+		},
+		[]string{"cluster", "group", "topic", "partition"},
+	)
+	KafkaConsumerPartitionCurrentStatus = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "kafka_burrow_partition_status",
+			Help: "The status of a partition as reported by burrow.",
 		},
 		[]string{"cluster", "group", "topic", "partition"},
 	)
@@ -31,6 +49,13 @@ var (
 		},
 		[]string{"cluster", "group"},
 	)
+	KafkaConsumerStatus = prometheus.NewGaugeVec(
+		prometheus.GaugeOpts{
+			Name: "kafka_burrow_status",
+			Help: "The status of a partition as reported by burrow.",
+		},
+		[]string{"cluster", "group"},
+	)
 	KafkaTopicPartitionOffset = prometheus.NewGaugeVec(
 		prometheus.GaugeOpts{
 			Name: "kafka_burrow_topic_partition_offset",
@@ -43,7 +68,9 @@ var (
 func init() {
 	prometheus.MustRegister(KafkaConsumerPartitionLag)
 	prometheus.MustRegister(KafkaConsumerPartitionCurrentOffset)
+	prometheus.MustRegister(KafkaConsumerPartitionCurrentStatus)
 	prometheus.MustRegister(KafkaConsumerPartitionMaxOffset)
 	prometheus.MustRegister(KafkaConsumerTotalLag)
+	prometheus.MustRegister(KafkaConsumerStatus)
 	prometheus.MustRegister(KafkaTopicPartitionOffset)
 }
