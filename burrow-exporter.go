@@ -38,6 +38,14 @@ func main() {
 			Usage: "Burrow API version to leverage",
 			Value: 2,
 		},
+		cli.BoolFlag{
+			Name: "skip-partition-status",
+			Usage: "Skip exporting the per-partition status",
+		},
+		cli.BoolFlag{
+			Name: "skip-group-status",
+			Usage: "Skip exporting the per-group status",
+		},
 	}
 
 	app.Action = func(c *cli.Context) error {
@@ -62,7 +70,8 @@ func main() {
 
 		ctx, cancel := context.WithCancel(context.Background())
 
-		exporter := burrow_exporter.MakeBurrowExporter(c.String("burrow-addr"), c.Int("api-version"), c.String("metrics-addr"), c.Int("interval"))
+		exporter := burrow_exporter.MakeBurrowExporter(c.String("burrow-addr"), c.Int("api-version"),
+			c.String("metrics-addr"), c.Int("interval"), c.Bool("skip-partition-status"), c.Bool("skip-group-status"))
 		go exporter.Start(ctx)
 
 		<-done
