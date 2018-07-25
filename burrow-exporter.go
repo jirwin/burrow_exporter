@@ -24,27 +24,33 @@ func main() {
 		cli.StringFlag{
 			Name:  "burrow-addr",
 			Usage: "Address that burrow is listening on",
+			EnvVar: "BURROW_ADDR",
 		},
 		cli.StringFlag{
 			Name:  "metrics-addr",
 			Usage: "Address to run prometheus on",
+			EnvVar: "METRICS_ADDR",
 		},
 		cli.IntFlag{
 			Name:  "interval",
 			Usage: "The interval(seconds) specifies how often to scrape burrow.",
+			EnvVar: "INTERVAL",
 		},
 		cli.IntFlag{
 			Name:  "api-version",
 			Usage: "Burrow API version to leverage",
 			Value: 2,
+			EnvVar: "API_VERSION",
 		},
 		cli.BoolFlag{
 			Name: "skip-partition-status",
 			Usage: "Skip exporting the per-partition status",
+			EnvVar: "SKIP_PARTITION_STATUS",
 		},
 		cli.BoolFlag{
 			Name: "skip-group-status",
 			Usage: "Skip exporting the per-group status",
+			EnvVar: "SKIP_GROUP_STATUS",
 		},
 	}
 
