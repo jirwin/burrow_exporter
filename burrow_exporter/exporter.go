@@ -16,12 +16,17 @@ import (
 )
 
 type BurrowExporter struct {
-	client              *BurrowClient
-	metricsListenAddr   string
-	interval            int
-	wg                  sync.WaitGroup
-	skipPartitionStatus bool
-	skipConsumerStatus  bool
+	client                     *BurrowClient
+	metricsListenAddr          string
+	interval                   int
+	wg                         sync.WaitGroup
+	skipPartitionStatus        bool
+	skipConsumerStatus         bool
+	skipPartitionLag           bool
+	skipPartitionCurrentOffset bool
+	skipPartitionMaxOffset     bool
+	skipTotalLag               bool
+	skipTopicPartitionOffset   bool
 }
 
 func (be *BurrowExporter) processGroup(cluster, group string) {
@@ -34,19 +39,23 @@ func (be *BurrowExporter) processGroup(cluster, group string) {
 	}
 
 	for _, partition := range status.Status.Partitions {
-		KafkaConsumerPartitionLag.With(prometheus.Labels{
-			"cluster":   status.Status.Cluster,
-			"group":     status.Status.Group,
-			"topic":     partition.Topic,
-			"partition": strconv.Itoa(int(partition.Partition)),
-		}).Set(float64(partition.End.Lag))
+		if !be.skipPartitionLag {
+			KafkaConsumerPartitionLag.With(prometheus.Labels{
+				"cluster":   status.Status.Cluster,
+				"group":     status.Status.Group,
+				"topic":     partition.Topic,
+				"partition": strconv.Itoa(int(partition.Partition)),
+			}).Set(float64(partition.End.Lag))
+		}
 
-		KafkaConsumerPartitionCurrentOffset.With(prometheus.Labels{
-			"cluster":   status.Status.Cluster,
-			"group":     status.Status.Group,
-			"topic":     partition.Topic,
-			"partition": strconv.Itoa(int(partition.Partition)),
-		}).Set(float64(partition.End.Offset))
+		if !be.skipPartitionCurrentOffset {
+			KafkaConsumerPartitionCurrentOffset.With(prometheus.Labels{
+				"cluster":   status.Status.Cluster,
+				"group":     status.Status.Group,
+				"topic":     partition.Topic,
+				"partition": strconv.Itoa(int(partition.Partition)),
+			}).Set(float64(partition.End.Offset))
+		}
 
 		if !be.skipPartitionStatus {
 			KafkaConsumerPartitionCurrentStatus.With(prometheus.Labels{
@@ -57,18 +66,22 @@ func (be *BurrowExporter) processGroup(cluster, group string) {
 			}).Set(float64(Status[partition.Status]))
 		}
 
-		KafkaConsumerPartitionMaxOffset.With(prometheus.Labels{
-			"cluster":   status.Status.Cluster,
-			"group":     status.Status.Group,
-			"topic":     partition.Topic,
-			"partition": strconv.Itoa(int(partition.Partition)),
-		}).Set(float64(partition.End.MaxOffset))
+		if !be.skipPartitionMaxOffset {
+			KafkaConsumerPartitionMaxOffset.With(prometheus.Labels{
+				"cluster":   status.Status.Cluster,
+				"group":     status.Status.Group,
+				"topic":     partition.Topic,
+				"partition": strconv.Itoa(int(partition.Partition)),
+			}).Set(float64(partition.End.MaxOffset))
+		}
 	}
 
-	KafkaConsumerTotalLag.With(prometheus.Labels{
-		"cluster": status.Status.Cluster,
-		"group":   status.Status.Group,
-	}).Set(float64(status.Status.TotalLag))
+	if !be.skipTotalLag {
+		KafkaConsumerTotalLag.With(prometheus.Labels{
+			"cluster": status.Status.Cluster,
+			"group":   status.Status.Group,
+		}).Set(float64(status.Status.TotalLag))
+	}
 
 	if !be.skipConsumerStatus {
 		KafkaConsumerStatus.With(prometheus.Labels{
@@ -88,12 +101,14 @@ func (be *BurrowExporter) processTopic(cluster, topic string) {
 		return
 	}
 
-	for i, offset := range details.Offsets {
-		KafkaTopicPartitionOffset.With(prometheus.Labels{
-			"cluster":   cluster,
-			"topic":     topic,
-			"partition": strconv.Itoa(i),
-		}).Set(float64(offset))
+	if !be.skipTopicPartitionOffset {
+		for i, offset := range details.Offsets {
+			KafkaTopicPartitionOffset.With(prometheus.Labels{
+				"cluster":   cluster,
+				"topic":     topic,
+				"partition": strconv.Itoa(i),
+			}).Set(float64(offset))
+		}
 	}
 }
 
@@ -208,12 +223,17 @@ func (be *BurrowExporter) mainLoop(ctx context.Context) {
 }
 
 func MakeBurrowExporter(burrowUrl string, apiVersion int, metricsAddr string, interval int, skipPartitionStatus bool,
-	skipConsumerStatus bool) *BurrowExporter {
+	skipConsumerStatus bool, skipPartitionLag bool, skipPartitionCurrentOffset bool, skipPartitionMaxOffset bool, skipTotalLag bool, skipTopicPartitionOffset bool) *BurrowExporter {
 	return &BurrowExporter{
-		client:              MakeBurrowClient(burrowUrl, apiVersion),
-		metricsListenAddr:   metricsAddr,
-		interval:            interval,
-		skipPartitionStatus: skipPartitionStatus,
-		skipConsumerStatus:  skipConsumerStatus,
+		client:                     MakeBurrowClient(burrowUrl, apiVersion),
+		metricsListenAddr:          metricsAddr,
+		interval:                   interval,
+		skipPartitionStatus:        skipPartitionStatus,
+		skipConsumerStatus:         skipConsumerStatus,
+		skipPartitionLag:           skipPartitionLag,
+		skipPartitionCurrentOffset: skipPartitionCurrentOffset,
+		skipPartitionMaxOffset:     skipPartitionMaxOffset,
+		skipTotalLag:               skipTotalLag,
+		skipTopicPartitionOffset:   skipTopicPartitionOffset,
 	}
 }
