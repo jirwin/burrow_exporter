@@ -14,7 +14,7 @@ import (
 	"github.com/jirwin/burrow_exporter/burrow_exporter"
 )
 
-var Version = "0.0.4"
+var Version = "0.0.5"
 
 func main() {
 	app := cli.NewApp()
@@ -22,35 +22,60 @@ func main() {
 	app.Name = "burrow-exporter"
 	app.Flags = []cli.Flag{
 		cli.StringFlag{
-			Name:  "burrow-addr",
-			Usage: "Address that burrow is listening on",
+			Name:   "burrow-addr",
+			Usage:  "Address that burrow is listening on",
 			EnvVar: "BURROW_ADDR",
 		},
 		cli.StringFlag{
-			Name:  "metrics-addr",
-			Usage: "Address to run prometheus on",
+			Name:   "metrics-addr",
+			Usage:  "Address to run prometheus on",
 			EnvVar: "METRICS_ADDR",
 		},
 		cli.IntFlag{
-			Name:  "interval",
-			Usage: "The interval(seconds) specifies how often to scrape burrow.",
+			Name:   "interval",
+			Usage:  "The interval(seconds) specifies how often to scrape burrow.",
 			EnvVar: "INTERVAL",
 		},
 		cli.IntFlag{
-			Name:  "api-version",
-			Usage: "Burrow API version to leverage",
-			Value: 2,
+			Name:   "api-version",
+			Usage:  "Burrow API version to leverage",
+			Value:  2,
 			EnvVar: "API_VERSION",
 		},
 		cli.BoolFlag{
-			Name: "skip-partition-status",
-			Usage: "Skip exporting the per-partition status",
+			Name:   "skip-partition-status",
+			Usage:  "Skip exporting the per-partition status",
 			EnvVar: "SKIP_PARTITION_STATUS",
 		},
 		cli.BoolFlag{
-			Name: "skip-group-status",
-			Usage: "Skip exporting the per-group status",
+			Name:   "skip-group-status",
+			Usage:  "Skip exporting the per-group status",
 			EnvVar: "SKIP_GROUP_STATUS",
+		},
+		cli.BoolFlag{
+			Name:   "skip-partition-lag",
+			Usage:  "Skip exporting the partition lag",
+			EnvVar: "SKIP_PARTITION_LAG",
+		},
+		cli.BoolFlag{
+			Name:   "skip-partition-current-offset",
+			Usage:  "Skip exporting the current offset per partition",
+			EnvVar: "SKIP_PARTITION_CURRENT_OFFSET",
+		},
+		cli.BoolFlag{
+			Name:   "skip-partition-max-offset",
+			Usage:  "Skip exporting the partition max offset",
+			EnvVar: "SKIP_PARTITION_MAX_OFFSET",
+		},
+		cli.BoolFlag{
+			Name:   "skip-total-lag",
+			Usage:  "Skip exporting the total lag",
+			EnvVar: "SKIP_TOTAL_LAG",
+		},
+		cli.BoolFlag{
+			Name:   "skip-topic-partition-offset",
+			Usage:  "Skip exporting topic partition offset",
+			EnvVar: "SKIP_TOPIC_PARTITION_OFFSET",
 		},
 	}
 
@@ -76,8 +101,18 @@ func main() {
 
 		ctx, cancel := context.WithCancel(context.Background())
 
-		exporter := burrow_exporter.MakeBurrowExporter(c.String("burrow-addr"), c.Int("api-version"),
-			c.String("metrics-addr"), c.Int("interval"), c.Bool("skip-partition-status"), c.Bool("skip-group-status"))
+		exporter := burrow_exporter.MakeBurrowExporter(
+			c.String("burrow-addr"),
+			c.Int("api-version"),
+			c.String("metrics-addr"),
+			c.Int("interval"),
+			c.Bool("skip-partition-status"),
+			c.Bool("skip-group-status"),
+			c.Bool("skip-partition-lag"),
+			c.Bool("skip-partition-current-offset"),
+			c.Bool("skip-partition-max-offset"),
+			c.Bool("skip-total-lag"),
+			c.Bool("skip-topic-partition-offset"))
 		go exporter.Start(ctx)
 
 		<-done
