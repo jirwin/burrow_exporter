@@ -45,7 +45,7 @@ func (be *BurrowExporter) processGroup(cluster, group string) {
 				"group":     status.Status.Group,
 				"topic":     partition.Topic,
 				"partition": strconv.Itoa(int(partition.Partition)),
-			}).Set(float64(partition.End.Lag))
+			}).Set(float64(partition.CurrentLag))
 		}
 
 		if !be.skipPartitionCurrentOffset {
