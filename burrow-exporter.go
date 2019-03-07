@@ -77,6 +77,11 @@ func main() {
 			Usage:  "Skip exporting topic partition offset",
 			EnvVar: "SKIP_TOPIC_PARTITION_OFFSET",
 		},
+		cli.IntFlag{
+			Name:   "verbosity",
+			Usage:  "Set the log level",
+			EnvVar: "LOG_LEVEL",
+		},
 	}
 
 	app.Action = func(c *cli.Context) error {
@@ -100,6 +105,8 @@ func main() {
 		signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
 
 		ctx, cancel := context.WithCancel(context.Background())
+
+		burrow_exporter.SetLogLevel(c.Int("verbosity"))
 
 		exporter := burrow_exporter.MakeBurrowExporter(
 			c.String("burrow-addr"),
