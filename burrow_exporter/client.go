@@ -70,11 +70,12 @@ type ConsumerGroupStatus struct {
 }
 
 type Partition struct {
-	Topic     string `json:"topic"`
-	Partition int32  `json:"partition"`
-	Status    string `json:"status"`
-	Start     Offset `json:"start"`
-	End       Offset `json:"end"`
+	Topic      string `json:"topic"`
+	Partition  int32  `json:"partition"`
+	Status     string `json:"status"`
+	Start      Offset `json:"start"`
+	End        Offset `json:"end"`
+	CurrentLag int64  `json:"current_lag"`
 }
 
 type ConsumerGroupStatusResp struct {
