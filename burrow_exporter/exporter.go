@@ -44,6 +44,7 @@ func (be *BurrowExporter) processGroup(cluster, group string) {
 				"cluster":   status.Status.Cluster,
 				"group":     status.Status.Group,
 				"topic":     partition.Topic,
+				"owner":     partition.Owner,
 				"partition": strconv.Itoa(int(partition.Partition)),
 			}).Set(float64(partition.CurrentLag))
 		}
@@ -53,6 +54,7 @@ func (be *BurrowExporter) processGroup(cluster, group string) {
 				"cluster":   status.Status.Cluster,
 				"group":     status.Status.Group,
 				"topic":     partition.Topic,
+				"owner":     partition.Owner,
 				"partition": strconv.Itoa(int(partition.Partition)),
 			}).Set(float64(partition.End.Offset))
 		}

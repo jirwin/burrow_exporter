@@ -15,7 +15,7 @@ An address to run prometheus on is required. Default: 0.0.0.0:8080
 A scrape interval is required. Default: 30
 
 #### API_VERSION
-Burrow API version to leverage (default: 2)
+Burrow API version to leverage (default: 3)
 
 ### Example
 
@@ -28,7 +28,7 @@ docker run -d -p 8080:8080 \
   -e BURROW_ADDR="http://localhost:8000" \
   -e METRICS_ADDR="0.0.0.0:8080" \
   -e INTERVAL="30" \
-  -e API_VERSION="2" \
+  -e API_VERSION="3" \
   burrow_exporter
 # with custom command
 docker run -d -p 8080:8080 burrow_exporter ./burrow-exporter --burrow-addr http://localhost:8000 --metrics-addr 0.0.0.0:8080 --interval 30 --api-version 2
