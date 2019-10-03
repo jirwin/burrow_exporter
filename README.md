@@ -15,7 +15,7 @@ An address to run prometheus on is required. Default: 0.0.0.0:8080
 A scrape interval is required. Default: 30
 
 #### API_VERSION
-Burrow API version to leverage (default: 2)
+Burrow API version to leverage (default: 3)
 
 ### Example
 
