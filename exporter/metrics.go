@@ -1,4 +1,4 @@
-package burrow_exporter
+package exporter
 
 import "github.com/prometheus/client_golang/prometheus"
 
