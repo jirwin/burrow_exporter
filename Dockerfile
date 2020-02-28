@@ -1,14 +1,10 @@
-FROM golang:alpine as glide
-RUN apk update
-RUN apk add git
-RUN go get github.com/Masterminds/glide
+FROM golang:1.14.0-alpine as builder
 WORKDIR /go/src/github.com/jirwin/burrow_exporter
 COPY . /go/src/github.com/jirwin/burrow_exporter
-RUN glide install
-RUN go build burrow-exporter.go
+RUN go build
 
-FROM alpine
-COPY --from=glide /go/src/github.com/jirwin/burrow_exporter/burrow-exporter .
+FROM alpine:3.9.5
+COPY --from=builder /go/src/github.com/jirwin/burrow_exporter/burrow-exporter .
 ENV BURROW_ADDR http://localhost:8000
 ENV METRICS_ADDR 0.0.0.0:8080
 ENV INTERVAL 30
