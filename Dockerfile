@@ -4,7 +4,7 @@ COPY . /go/src/github.com/jirwin/burrow_exporter
 RUN go build
 
 FROM alpine:3.9.5
-COPY --from=builder /go/src/github.com/jirwin/burrow_exporter/burrow-exporter .
+COPY --from=builder /go/src/github.com/jirwin/burrow_exporter/burrow_exporter .
 ENV BURROW_ADDR http://localhost:8000
 ENV METRICS_ADDR 0.0.0.0:8080
 ENV INTERVAL 30
