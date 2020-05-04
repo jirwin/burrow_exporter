@@ -1,4 +1,4 @@
-FROM golang:1.14.0-alpine as builder
+FROM golang:1.14.2-alpine as builder
 WORKDIR /go/src/github.com/jirwin/burrow_exporter
 COPY . /go/src/github.com/jirwin/burrow_exporter
 RUN go build
