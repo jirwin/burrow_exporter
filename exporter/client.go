@@ -1,4 +1,4 @@
-package burrow_exporter
+package exporter
 
 import (
 	"net/http"
@@ -12,7 +12,7 @@ import (
 
 	"fmt"
 
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 type BurrowResp struct {
