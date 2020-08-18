@@ -1,0 +1,27 @@
+
+expose:
+  Annotations:
+    helm.sh/hook: post-install,post-upgrade
+    helm.sh/hook-delete-policy: hook-succeeded
+  config:
+    exposer: Ingress
+    http: true
+    tlsacme: false
+
+cleanup:
+  Args:
+    - --cleanup
+  Annotations:
+    helm.sh/hook: pre-delete
+    helm.sh/hook-delete-policy: hook-succeeded
+
+preview:
+  image:
+    repository:
+    tag:
+    pullPolicy: IfNotPresent
+  env:
+    BURROW_ADDR: http://burrow.jx-staging:8000
+    METRICS_ADDR: 0.0.0.0:8080
+    INTERVAL: 10
+    API_VERSION: 3
