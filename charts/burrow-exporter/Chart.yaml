@@ -1,0 +1,6 @@
+apiVersion: v1
+description: A Helm chart for Kubernetes
+icon: https://pbs.twimg.com/profile_images/699217734492647428/pCfEzr6L_400x400.png
+name: burrow-exporter
+version: 1.0
+
