@@ -155,7 +155,7 @@ func (be *BurrowExporter) processCluster(cluster string) {
 }
 
 func (be *BurrowExporter) startPrometheus() {
-	http.Handle("/metrics", promhttp.Handler())
+	http.Handle("/actuator/prometheus", promhttp.Handler())
 	go http.ListenAndServe(be.metricsListenAddr, nil)
 }
 
