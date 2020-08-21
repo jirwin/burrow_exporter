@@ -37,7 +37,7 @@ resources:
     cpu: 800m
     memory: 512Mi
 
-probePath: /metrics
+probePath: /actuator/prometheus
 livenessProbe:
   initialDelaySeconds: 180
   periodSeconds: 10
