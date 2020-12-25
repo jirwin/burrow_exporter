@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"os"
 
 	"github.com/jirwin/burrow_exporter/burrow_exporter"
@@ -23,22 +22,25 @@ func main() {
 		cli.StringFlag{
 			Name:   "burrow-addr",
 			Usage:  "Address that burrow is listening on",
+			Value:  "http://localhost:8000",
 			EnvVar: "BURROW_ADDR",
 		},
 		cli.StringFlag{
 			Name:   "metrics-addr",
 			Usage:  "Address to run prometheus on",
+			Value:  "0.0.0.0:8080",
 			EnvVar: "METRICS_ADDR",
 		},
 		cli.IntFlag{
 			Name:   "interval",
 			Usage:  "The interval(seconds) specifies how often to scrape burrow.",
+			Value:  30,
 			EnvVar: "INTERVAL",
 		},
 		cli.IntFlag{
 			Name:   "api-version",
 			Usage:  "Burrow API version to leverage",
-			Value:  2,
+			Value:  3,
 			EnvVar: "API_VERSION",
 		},
 		cli.BoolFlag{
@@ -79,20 +81,6 @@ func main() {
 	}
 
 	app.Action = func(c *cli.Context) error {
-		if !c.IsSet("burrow-addr") {
-			fmt.Println("A burrow address is required (e.g. --burrow-addr http://localhost:8000)")
-			os.Exit(1)
-		}
-
-		if !c.IsSet("metrics-addr") {
-			fmt.Println("An address to run prometheus on is required (e.g. --metrics-addr localhost:8080)")
-			os.Exit(1)
-		}
-
-		if !c.IsSet("interval") {
-			fmt.Println("A scrape interval is required (e.g. --interval 30)")
-			os.Exit(1)
-		}
 
 		done := make(chan os.Signal, 1)
 
