@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"os"
 
-	"github.com/kebyn/burrow_exporter/burrow_exporter"
+	"github.com/jirwin/burrow_exporter/burrow_exporter"
 	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 

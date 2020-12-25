@@ -1,4 +1,4 @@
-module github.com/kebyn/burrow_exporter
+module github.com/jirwin/burrow_exporter
 
 go 1.15
 
