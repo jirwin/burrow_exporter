@@ -13,10 +13,9 @@ FROM scratch
 
 ENV BURROW_ADDR http://localhost:8000
 ENV METRICS_ADDR 0.0.0.0:8080
-ENV INTERVAL 30
-ENV API_VERSION 2
+ENV API_VERSION 3
 
 COPY --from=0 /opt/burrow-exporter .
 
 ENTRYPOINT ["/burrow-exporter"]
-CMD ["--burrow-addr", "$BURROW_ADDR", "--metrics-addr", "$METRICS_ADDR", "--interval", "$INTERVAL", "--api-version", "$API_VERSION"]
+CMD "--burrow-addr" "$BURROW_ADDR" "--metrics-addr" "$METRICS_ADDR" "--interval" "$INTERVAL" "--api-version" "$API_VERSION"
