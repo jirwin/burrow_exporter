@@ -4,14 +4,13 @@ import (
 	"fmt"
 	"os"
 
-	log "github.com/Sirupsen/logrus"
+	"github.com/kebyn/burrow_exporter/burrow_exporter"
+	log "github.com/sirupsen/logrus"
 	"github.com/urfave/cli"
 
 	"context"
 	"os/signal"
 	"syscall"
-
-	"github.com/jirwin/burrow_exporter/burrow_exporter"
 )
 
 var Version = "0.0.5"
