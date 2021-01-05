@@ -1,16 +1,21 @@
-FROM golang:alpine as glide
-RUN apk update
-RUN apk add git
-RUN go get github.com/Masterminds/glide
-WORKDIR /go/src/github.com/jirwin/burrow_exporter
-COPY . /go/src/github.com/jirwin/burrow_exporter
-RUN glide install
-RUN go build burrow-exporter.go
+FROM golang:alpine
 
-FROM alpine
-COPY --from=glide /go/src/github.com/jirwin/burrow_exporter/burrow-exporter .
+# ENV GO111MODULE=on
+# ENV GOPROXY=https://goproxy.cn
+
+WORKDIR /opt
+
+COPY . .
+
+RUN CGO_ENABLED=0 go build -ldflags "-s" -o burrow-exporter
+
+FROM scratch
+
 ENV BURROW_ADDR http://localhost:8000
 ENV METRICS_ADDR 0.0.0.0:8080
-ENV INTERVAL 30
-ENV API_VERSION 2
-CMD ./burrow-exporter --burrow-addr $BURROW_ADDR --metrics-addr $METRICS_ADDR --interval $INTERVAL --api-version $API_VERSION
+ENV API_VERSION 3
+
+COPY --from=0 /opt/burrow-exporter .
+
+ENTRYPOINT ["/burrow-exporter"]
+CMD "--burrow-addr" "$BURROW_ADDR" "--metrics-addr" "$METRICS_ADDR" "--interval" "$INTERVAL" "--api-version" "$API_VERSION"

@@ -1,6 +1,7 @@
 package burrow_exporter
 
 import (
+	"fmt"
 	"net/http"
 	"net/url"
 	"time"
@@ -10,9 +11,7 @@ import (
 	"encoding/json"
 	"errors"
 
-	"fmt"
-
-	log "github.com/Sirupsen/logrus"
+	log "github.com/sirupsen/logrus"
 )
 
 type BurrowResp struct {
