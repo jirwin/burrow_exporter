@@ -1,0 +1,59 @@
+name: burrow-exporter
+
+on:
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+
+  actions:
+    name: Release
+    runs-on: ubuntu-20.04
+    steps:
+
+    - name: Set up Go version
+      uses: actions/setup-go@v2
+      with:
+        go-version: ^1.15
+
+    - name: Check out code into the Go module directory
+      uses: actions/checkout@v2
+
+    - name: Build
+      run: CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -v -ldflags "-s" -o burrow-exporter
+
+    # - name: Archive code coverage results
+    #   uses: actions/upload-artifact@v2
+    #   with:
+    #     name: burrow-exporter
+    #     path: burrow-exporter
+    #     retention-days: 1
+
+    - name: Create Release
+      id: create_release
+      uses: actions/create-release@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        tag_name: ${{ github.ref }}
+        release_name: Release ${{ github.ref }}
+        body: |
+          Changes in this Release
+          - Use go mod
+          - Update Burrow API to v3 version
+          - Update Dockerfile
+        draft: false
+        prerelease: false
+
+
+    - name: Upload Release Asset
+      id: upload-release-asset 
+      uses: actions/upload-release-asset@v1
+      env:
+        GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+      with:
+        upload_url: ${{ steps.create_release.outputs.upload_url }}
+        asset_path: ./burrow-exporter
+        asset_name: burrow-exporter
+        asset_content_type: application/octet-stream
