@@ -11,7 +11,7 @@ import (
 	"os/signal"
 	"syscall"
 
-	"github.com/jirwin/burrow_exporter/burrow_exporter"
+	"github.com/yext/burrow_exporter/burrow_exporter"
 )
 
 var Version = "0.0.5"
